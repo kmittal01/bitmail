@@ -19,6 +19,7 @@
     "helmet": "^3.6.1",
     "kiteconnect": "^1.2.2",
     "mongodb": "^2.2.29",
+    "mongoose": "^4.10.8",
     "url-join": "^2.0.2"
   },
   "devDependencies": {
