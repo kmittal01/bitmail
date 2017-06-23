@@ -9,6 +9,7 @@
   "author": "Kshitij Mittal",
   "license": "ISC",
   "dependencies": {
+    "@google-cloud/pubsub": "^0.13.0",
     "body-parser": "^1.17.2",
     "compression": "^1.6.2",
     "express": "^4.15.3",
