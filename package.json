@@ -1,0 +1,21 @@
+{
+  "name": "BitEmail",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "mocha spec/* --timeout 2000"
+  },
+  "author": "Kshitij Mittal",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.17.2",
+    "compression": "^1.6.2",
+    "express": "^4.15.3",
+    "express-validator": "^3.2.0",
+    "googleapis": "^19.0.0",
+    "helmet": "^3.6.1",
+    "kiteconnect": "^1.2.2",
+    "mongodb": "^2.2.29"
+  }
+}
