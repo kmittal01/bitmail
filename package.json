@@ -4,6 +4,7 @@
   "description": "",
   "main": "app.js",
   "scripts": {
+    "start": "nodemon app.js --exec babel-node  --presets es2015,stage-2",
     "test": "mocha spec/* --timeout 2000"
   },
   "author": "Kshitij Mittal",
@@ -17,6 +18,15 @@
     "googleapis": "^19.0.0",
     "helmet": "^3.6.1",
     "kiteconnect": "^1.2.2",
-    "mongodb": "^2.2.29"
+    "mongodb": "^2.2.29",
+    "url-join": "^2.0.2"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.24.1",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-stage-2": "^6.24.1",
+    "node-inspector": "^1.1.1",
+    "nodemon": "^1.11.0",
+    "rimraf": "^2.6.1"
   }
 }
