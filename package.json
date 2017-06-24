@@ -22,6 +22,7 @@
     "kiteconnect": "^1.2.2",
     "mongodb": "^2.2.29",
     "mongoose": "^4.10.8",
+    "solc": "^0.4.11",
     "url-join": "^2.0.2",
     "web3": "github:shayanb/web3.js#develop"
   },
