@@ -13,5 +13,11 @@ module.exports = {
     OAUTH2_REDIRECT_URL: urljoin(BASE_URL, 'auth/google/callback/'),
     PROJECT_ID: 'bitemailer-171607',
     GMAIL_PUBSUB_TOPIC: 'projects/bitemailer-171607/topics/gmail_events'
+  },
+  ETH_CLIENT: 'http://127.0.0.1:8545',
+  DB_URL: 'mongodb://127.0.0.1/bitmail',
+  BITMAIL_CONTRACT: {
+    PATH: './contracts/BitEmail.sol',
+    NAME: ':BitEmail'
   }
 };
