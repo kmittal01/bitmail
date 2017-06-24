@@ -1,3 +1,4 @@
+const path = require('path');
 const express    = require('express');        // call express
 const app        = express();                 // define our app using express
 const helmet = require('helmet');
@@ -6,8 +7,12 @@ const bodyParser = require('body-parser');
 const expressValidator = require('express-validator');
 const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
+const nunjucks = require('nunjucks');
 
 const db = require('./db');
+
+
+const VIEW_DIR = path.join(__dirname, 'public/views')
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -21,7 +26,11 @@ app.use(session({
   saveUninitialized: true,
   store: new MongoStore({ mongooseConnection: db.getConnection() })
 }));
-
+app.use(express.static('public'));
+nunjucks.configure(VIEW_DIR, {
+    autoescape: true,
+    express: app
+});
 
 const port = process.env.PORT || 8887;        // set our port
 

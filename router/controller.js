@@ -7,7 +7,6 @@ const config = require('../config');
 module.exports = {
   initAuth(req, res) {
     const url = google.authorize();
-    console.log('Auth URL is ', url);
     res.redirect(url);
   },
 
@@ -30,11 +29,8 @@ module.exports = {
               email: resp.email
             };
             sess.save();
-            console.log(req.session, req.sessionID);
-            res.status(200).json({
-              id: resp._id,
-              email: resp.email
-            });
+            google.watchMessage(resp.accessToken);
+            res.redirect('/wallet/');
           }
         });
       });
@@ -50,6 +46,8 @@ module.exports = {
     eth.createContract(
       contractName, source, data.accountAddr, (err, contractAddr) => {
         data.contractAddr = contractAddr;
+        eth.registerEventListener(contractName, contractAddr, 'BidEvent',
+                                  this.onBidReceived.bind(this));
         db.updateUser(user.email, data, (err, user) => {
           if(err) {
             console.error('Failed to authenticate user. Try Again', err);
@@ -62,6 +60,61 @@ module.exports = {
             });
           }
         });
+    });
+  },
+
+  onBidReceived(error, result) {
+    const senderAddr = result.senderAddr;
+    const messageId = result.emailID;
+    const bid = result.bid.toNumber();
+    db.onBidEmail(messageId, bid);
+  },
+
+  _getReceiverForEmail(query, callback) {
+    db.getEmailByQuery(q, (err, email) => {
+      if (err) {
+        callback(err);
+        return;
+      }
+      db.getUserById(email.userId, callback);
+    });
+  },
+
+  sendEmailBid(req, res, next) {
+    const data = req.body;
+    const contractName = config.BITMAIL_CONTRACT.NAME;
+    this._getReceiverForEmail({ _id: data.emailId }, (err, user) => {
+      if (err) {
+        next(err);
+        return;
+      }
+      eth.contractTransaction(
+        contractName, contractAddr, 'makeEmailBid',
+        [email.messageId, expiry], {
+          from: senderAddr,
+          value: eth.web3.toWei(bid, 'ether')
+        }, function(error, result) {
+        console.log("Make Bid Result", error, result);
+      });
+    });
+    res.status(204).send();
+  },
+
+  onEmailReplied(messageId) {
+    this._getReceiverForEmail({ messageId }, (err, user) => {
+      if (err) {
+        next(err);
+        return;
+      }
+      const contractName = config.BITMAIL_CONTRACT.NAME;
+      const contractAddr = user.contractAddr;
+      eth.contractTransaction(
+        contractName, contractAddr, 'onEmailReplied',
+        [messageId], {
+          from: user.accountAddr,
+        }, function(error, result) {
+        console.log("ON Email Replied", error, result);
+      });
     });
   }
 }

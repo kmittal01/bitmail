@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Bitmail</title>
+  <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" href="../static/css/common.css">
+  <script type="text/javascript" src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+  <script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+  <script type="text/javascript" >
+   $(document).ready(function() {
+     $('#submit-wallet').click(function() {
+       console.log('Submit Wallet Clicket');
+       $.ajax({
+         type: 'POST',
+         url: '/user/wallet/',
+         data: {
+           accountAddr: $('#walletAddr')[0].value
+         },
+         success: function(data) {
+           console.log('Succesffully Added Wallet Address');
+         }
+       });
+     });
+   });
+
+  </script>
+
+</head>
+<body>
+  <div class="container">
+    <div class="vertical-center">
+      <div class="jumbotron">
+        <h1>Add Wallet Address</h1>
+        <p>Add Your Ethereum wallet address where ethereum is to be transferred </p>
+        <form role="form">
+          <div class="form-group float-label-control">
+            <input type="input" class="form-control" id="walletAddr" placeholder="Wallet">
+          </div>
+        <div class="col-sm-6 col-sm-offset-3">
+          <input type="button" id="submit-wallet"
+                 class="form-control btn btn-primary" value="Submit">
+        </div>
+        </form>
+       </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -45,7 +45,7 @@ module.exports = {
   getConnection() {
     return mongoose.connection;
   },
-  
+
   createOrUpdateUser(email, value, callback = null) {
     User.updateOne({ email }, value, {
       upsert: true,
@@ -87,27 +87,53 @@ module.exports = {
     });
   },
 
-  createEmail(receiver, sender, messageId) {
+  getEmailById(emailId, callback) {
+    Email.findById(emailId, (err, email) => {
+      if(err) {
+        callback(err);
+      } else if(!email) {
+        callback(new Error('No email found in the db for give messageId'));
+      } else {
+        callback(null, email);
+      }
+    });
+  },
+
+  getEmailByQuery(query, callback) {
+    Email.findOne(query, (err, email) => {
+      if(err) {
+        callback(err);
+      } else if(!email) {
+        callback(new Error('No email found in the db for give messageId'));
+      } else {
+        callback(null, email);
+      }
+    });
+  }
+
+  getUserById(userId, callback) {
+    User.findById(userId, callback);
+  },
+
+  createEmail(receiver, messageId) {
     this.getUserByEmail(receiver, (err, receiver) => {
       Email({
         userId: receiver._id,
-        sender: sender,
         messageId: messageId
       }).save();
     });
   },
 
-  onBidEmail(emailId, bid, expiry) {
-    Email.findById(emailId, (err, email) => {
+  onBidEmail(messageId, bid) {
+    Email.findOne({ messageId }, (err, email) => {
       email.bid = bid;
-      email.expiry = expiry;
       email.status = 'BID';
       email.save();
     });
   },
 
-  onEmailReplied(emailId) {
-    Email.findById(emailId, (err, email) => {
+  onEmailReplied(messageId) {
+    Email.findOne({ messageId }, (err, email) => {
       email.status = 'REPLIED';
       email.save();
     });

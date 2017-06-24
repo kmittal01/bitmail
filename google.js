@@ -39,7 +39,6 @@ module.exports = {
         callback(err);
         return;
       }
-      console.log('Fetched Tokens', tokens);
       oauth2Client.setCredentials(tokens);
       plus.people.get({ userId: 'me', auth: oauth2Client }, function(error, user) {
         if (error) {

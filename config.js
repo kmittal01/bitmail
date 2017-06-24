@@ -19,5 +19,6 @@ module.exports = {
   BITMAIL_CONTRACT: {
     PATH: './contracts/BitEmail.sol',
     NAME: ':BitEmail'
-  }
+  },
+  VIEWS_DIR: __dirname + '/public/views/'
 };

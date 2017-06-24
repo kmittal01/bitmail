@@ -19,7 +19,6 @@ function getAccount(index) {
 
 function registerContract(contractName, source, sender) {
   const compiledContract = solc.compile(source, 1);
-  console.log(compiledContract);
   const bytecode = compiledContract.contracts[contractName].bytecode;
   const abi = JSON.parse(compiledContract.contracts[contractName].interface);
   const contractFactory = web3.eth.contract(abi);
@@ -66,9 +65,24 @@ function getContractInstance(contractName, contractAddr) {
   return null;
 }
 
+function contractTransaction(name, addr, funcName, params = [],
+                             transOptions,
+                             callback) {
+  const contractInstance = eth.getContractInstance(name, addr);
+  const func = constractInstance(funcName);
+  const callData = func.getData(...params);
+  const gasEstimate = eth.web3.eth.estimateGas({
+    data: callData,
+    to: addr
+  });
+  transOptions[gas] = gasEstimate + 21000;
+  func(...params, transOptions, callback);
+}
+
 
 function registerEventListener(name, addr, event, callback) {
   const contractInstance = getContractInstance(name, addr);
+  console.log(contractInstance, event);
   const eventFunc = contractInstance[event];
   eventFunc({from: 0, to: 'latest'}, function(error, result) {
     if (result) {
