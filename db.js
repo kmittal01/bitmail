@@ -88,11 +88,10 @@ module.exports = {
     });
   },
 
-  createEmail(receiver, sender, messageId) {
-    this.getUserByEmail(receiver, (err, receiver) => {
+  createEmail(receiver, messageId) {
+    this.getUserByEmail(receiver.email, (err, receiver) => {
       Email({
         userId: receiver._id,
-        sender: sender,
         messageId: messageId
       }).save();
     });

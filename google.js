@@ -97,6 +97,7 @@ module.exports = {
             if(res.history){
               for (var i=0; i< res.history.length; i++){
                 self.modifyLabels(accessToken, addLabelIds, ["INBOX"], res.history[i]['messages'][0]['id'])
+                db.createEmail(user, res.history[i]['messages'][0]['id'])
               }
             }
           }
