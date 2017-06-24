@@ -20,7 +20,8 @@ const UserSchema = new mongoose.Schema({
   },
   accessToken: String,
   accountAddr: String,
-  contractAddr: String
+  contractAddr: String,
+  historyId: String
 });
 
 const EmailSchema = new mongoose.Schema({
@@ -45,7 +46,7 @@ module.exports = {
   getConnection() {
     return mongoose.connection;
   },
-
+  
   createOrUpdateUser(email, value, callback = null) {
     User.updateOne({ email }, value, {
       upsert: true,
@@ -62,7 +63,7 @@ module.exports = {
   },
 
   updateUser(email, values, callback) {
-    callback = callback || function(err, user){ console.log(err, user) };
+    callback = callback || function(err, user){ console.log(err) };
     User.updateOne({ email }, values, (err, res) => {
       if (err) {
         callback(err);
@@ -116,7 +117,7 @@ module.exports = {
   },
 
   createEmail(receiver, messageId) {
-    this.getUserByEmail(receiver, (err, receiver) => {
+    this.getUserByEmail(receiver.email, (err, receiver) => {
       Email({
         userId: receiver._id,
         messageId: messageId

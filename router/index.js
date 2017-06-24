@@ -4,7 +4,8 @@ const controller = require('./controller');
 const config = require('../config');
 
 module.exports = function(app) {
-    app.use('/auth/google/callback/', function(req, res) {
+  app
+    .use('/auth/google/callback/', function(req, res) {
       controller.completeAuth(req, res);
     })
 
@@ -20,13 +21,13 @@ module.exports = function(app) {
       controller.sendEmailBid(req, res, next);
     })
 
-    .use('/new-email', function(request,response){
-      console.log('new Email Received', request.body);
+    .use('/email/new/', function(req,res){
+    	controller.onEmailReceived(req, res)
     })
 
     .use('/googleac53f0beeb7fd695.html', function(request,response){
-      response.sendFile(__dirname+'/googleac53f0beeb7fd695.html');
-    })
+       response.sendFile(__dirname+'/googleac53f0beeb7fd695.html');
+    });
     .use('/wallet/', function(req, res) {
       res.sendFile('wallet.html', { root: config.VIEWS_DIR });
     })
@@ -36,5 +37,4 @@ module.exports = function(app) {
     .use('/', function(req, res) {
       res.sendFile('index.html', { root: config.VIEWS_DIR });
     });
-
 };
