@@ -98,6 +98,7 @@ module.exports = {
               for (var i=0; i< res.history.length; i++){
                 self.modifyLabels(accessToken, addLabelIds, ["INBOX"], res.history[i]['messages'][0]['id'])
                 db.createEmail(user, res.history[i]['messages'][0]['id'])
+                self.sendEmail(accessToken, "kshitij.mittal01@gmail.com", userEmail, "Please bid to proceed!", "Link to the contrat portal")
               }
             }
           }
@@ -169,5 +170,38 @@ module.exports = {
         }
       });
     }
-  }
+  },
+  sendEmail: function(accessToken, to, from, subject, message, callback=null){
+    const self=this;
+    const oauth2Client = self.getAuthClient(accessToken);
+    var options = {
+      userId: 'me',
+      auth: oauth2Client,
+      resource: {
+        raw: self.makeEmailBody(to, from, subject, message)
+      }
+    };
+    gmail.users.messages.send(options, function(err,res){
+      if(callback){
+        callback(err,res)
+      } else {
+        if (err){
+          console.error("Send Mail Method Failed!")
+        } else {
+          console.log("MailSuccessfully Sent" )
+        }
+      }
+    }); 
+  },
+  makeEmailBody: function(to, from, subject, message) {
+  var str = ["Content-Type: text/plain; charset=\"UTF-8\"\n",
+    "MIME-Version: 1.0\n",
+    "Content-Transfer-Encoding: 7bit\n",
+    "to: ", to, "\n",
+    "from: ", from, "\n",
+    "subject: ", subject, "\n\n",
+    message
+  ].join('');
+  return new Buffer(str).toString('base64');
+}
 };
