@@ -79,6 +79,48 @@ module.exports = {
     });
   },
 
-  handleEmailNotification: function(message) {
+  handleEmailNotification: function(userEmail, historyId, messageId, accessToken, refreshToken = null, callback=false) {
+    const oauth2Client = this.getAuthClient(accessToken, refreshToken);
+    var options = {
+      userId: 'me',
+      auth: oauth2Client,
+      historyTypes: "messageAdded",
+      startHistoryId: historyId
+    };
+    gmail.users.history.list(options, function (err, res) {
+      if (callback) {
+        callback(err, res);
+      } else {
+        if (err) {
+          console.error('Failed To Fetch Gmail History');
+        } else {
+          console.log(res)
+
+        }
+      }
+    });
+  },
+
+  createLabels: function(accessToken,labelList, refreshToken=null){
+    const oauth2Client = this.getAuthClient(accessToken, refreshToken);
+    for (var i=0; i< labelList.length; ++i){
+      console.log(labelList[i])
+      var options = {
+      userId: 'me',
+      auth: oauth2Client,
+      resource: {
+          name: labelList[i],
+          labelListVisibility: "labelHide",
+          messageListVisibility: "hide"
+        }
+      };
+      gmail.users.labels.create(options, function (err, res) {
+        if (err) {
+          console.error('Failed To Create Bit Labels');
+        } else {
+          console.log('Successfully Created The Bit Labels');
+        }
+      });
+    }
   }
 };

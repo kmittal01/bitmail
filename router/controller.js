@@ -35,6 +35,7 @@ module.exports = {
               id: resp._id,
               email: resp.email
             });
+            google.createLabels(user.accessToken,["bitblock","bitmail"])
           }
         });
       });
@@ -63,5 +64,17 @@ module.exports = {
           }
         });
     });
+  },
+
+  onEmailReceived(req,res) {
+    console.log(req.body)
+    const data_obj = JSON.parse(new Buffer(req.body.message.data, 'base64').toString())
+    const userEmail = data_obj.emailAddress 
+    const historyId = data_obj.historyId
+    const messageId = data_obj.messageId
+    db.getUserByEmail(userEmail,function(err, user){
+      const accessToken = user.accessToken 
+      google.handleEmailNotification(userEmail, historyId, messageId, accessToken)
+    })
   }
 }

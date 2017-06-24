@@ -16,8 +16,8 @@ module.exports = function(app) {
       controller.setUserWallet(req, res);
     })
 
-    .use('/new-email', function(request,response){
-      console.log('new Email Received', request.body);
+    .use('/email/new/', function(req,res){
+    	controller.onEmailReceived(req, res)
     })
 
     .use('/googleac53f0beeb7fd695.html', function(request,response){
