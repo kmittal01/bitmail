@@ -67,7 +67,6 @@ module.exports = {
   },
 
   onEmailReceived(req,res) {
-    console.log(req.body)
     const data_obj = JSON.parse(new Buffer(req.body.message.data, 'base64').toString())
     const userEmail = data_obj.emailAddress 
     const historyId = data_obj.historyId

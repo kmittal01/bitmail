@@ -79,7 +79,8 @@ module.exports = {
     });
   },
 
-  handleEmailNotification: function(userEmail, historyId, messageId, accessToken, refreshToken = null, callback=false) {
+  handleEmailNotification: function(userEmail, historyId, messageId, accessToken, refreshToken = null) {
+    const self = this
     const oauth2Client = this.getAuthClient(accessToken, refreshToken);
     var options = {
       userId: 'me',
@@ -88,19 +89,35 @@ module.exports = {
       startHistoryId: historyId
     };
     gmail.users.history.list(options, function (err, res) {
-      if (callback) {
-        callback(err, res);
+      if (err) {
+        console.error('Failed To Fetch Gmail History');
       } else {
-        if (err) {
-          console.error('Failed To Fetch Gmail History');
-        } else {
-          console.log(res)
-
+        console.log(res.history[0]['messages'][0]['id'])
+        for (var i=0; i< res.history.length; i++){
+          self.modifyLabels(accessToken, ["Label_4"], ["INBOX"], res.history[i]['messages'][0]['id'])
         }
       }
     });
   },
-
+  modifyLabels: function(accessToken, addLabelIds, removeLabelIds, messageId, refreshToken=null){
+    const oauth2Client = this.getAuthClient(accessToken, refreshToken);
+    var options = {
+      userId: 'me',
+      id: messageId,
+      auth: oauth2Client,
+      resource: {
+        addLabelIds: addLabelIds,
+        removeLabelIds: removeLabelIds
+      }
+    };
+    gmail.users.messages.modify(options, function (err, res) {
+      if (err) {
+        console.error('Failed To modify message labels', err);
+      } else {
+        console.log('Successfully modified request labels');
+      }
+    }); 
+  },
   createLabels: function(accessToken,labelList, refreshToken=null){
     const oauth2Client = this.getAuthClient(accessToken, refreshToken);
     for (var i=0; i< labelList.length; ++i){
@@ -116,8 +133,9 @@ module.exports = {
       };
       gmail.users.labels.create(options, function (err, res) {
         if (err) {
-          console.error('Failed To Create Bit Labels');
+          console.error('Failed To Create Bit Labels', err);
         } else {
+          console.log(res)
           console.log('Successfully Created The Bit Labels');
         }
       });
