@@ -4,6 +4,7 @@ const google = require('googleapis');
 const plus = google.plus('v1');
 const gmail = google.gmail('v1');
 const config = require('./config').GOOGLE;
+const db = require('./db');
 const OAuth2 = google.auth.OAuth2;
 
 module.exports = {
@@ -39,14 +40,12 @@ module.exports = {
         callback(err);
         return;
       }
-      console.log('Fetched Tokens', tokens);
       oauth2Client.setCredentials(tokens);
       plus.people.get({ userId: 'me', auth: oauth2Client }, function(error, user) {
         if (error) {
           callback(error);
           return;
         }
-        console.log('User', user);
         callback(null, {
           accessToken: tokens.access_token,
           refreshToken: tokens.refresh_token,
@@ -82,21 +81,25 @@ module.exports = {
   handleEmailNotification: function(userEmail, historyId, messageId, accessToken, refreshToken = null) {
     const self = this
     const oauth2Client = this.getAuthClient(accessToken, refreshToken);
-    var options = {
-      userId: 'me',
-      auth: oauth2Client,
-      historyTypes: "messageAdded",
-      startHistoryId: historyId
-    };
-    gmail.users.history.list(options, function (err, res) {
-      if (err) {
-        console.error('Failed To Fetch Gmail History');
-      } else {
-        console.log(res.history[0]['messages'][0]['id'])
-        for (var i=0; i< res.history.length; i++){
-          self.modifyLabels(accessToken, ["Label_4"], ["INBOX"], res.history[i]['messages'][0]['id'])
+    db.getUserByEmail(userEmail,function(err, user){
+      var options = {
+        userId: 'me',
+        auth: oauth2Client,
+        historyTypes: "messageAdded",
+        startHistoryId: user.historyId
+      };
+      gmail.users.history.list(options, function (err, res) {
+        if (err) {
+          console.error('Failed To Fetch Gmail History');
+        } else {
+          if(res.history){
+            for (var i=0; i< res.history.length; i++){
+              self.modifyLabels(accessToken, ["Label_4"], ["INBOX"], res.history[i]['messages'][0]['id'])
+            }
+          }
         }
-      }
+      });
+      db.updateUser(userEmail, {historyId: historyId})
     });
   },
   modifyLabels: function(accessToken, addLabelIds, removeLabelIds, messageId, refreshToken=null){
@@ -112,7 +115,7 @@ module.exports = {
     };
     gmail.users.messages.modify(options, function (err, res) {
       if (err) {
-        console.error('Failed To modify message labels', err);
+        console.error('Failed To modify message labels');
       } else {
         console.log('Successfully modified request labels');
       }
@@ -121,7 +124,6 @@ module.exports = {
   createLabels: function(accessToken,labelList, refreshToken=null){
     const oauth2Client = this.getAuthClient(accessToken, refreshToken);
     for (var i=0; i< labelList.length; ++i){
-      console.log(labelList[i])
       var options = {
       userId: 'me',
       auth: oauth2Client,
@@ -133,9 +135,8 @@ module.exports = {
       };
       gmail.users.labels.create(options, function (err, res) {
         if (err) {
-          console.error('Failed To Create Bit Labels', err);
+          console.error('Failed To Create Bit Labels');
         } else {
-          console.log(res)
           console.log('Successfully Created The Bit Labels');
         }
       });

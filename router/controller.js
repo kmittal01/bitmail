@@ -7,7 +7,7 @@ const config = require('../config');
 module.exports = {
   initAuth(req, res) {
     const url = google.authorize();
-    console.log('Auth URL is ', url);
+    // console.log('Auth URL is ', url);
     res.redirect(url);
   },
 
@@ -23,17 +23,18 @@ module.exports = {
             console.error('Failed to authenticate user. Try Again', err);
             res.status(500).send('Failed to authenticate user. Try Again');
           } else {
-            console.log(resp);
             const sess = req.session;
             sess.user = {
               id: resp._id,
               email: resp.email
             };
             sess.save();
-            console.log(req.session, req.sessionID);
             res.status(200).json({
               id: resp._id,
               email: resp.email
+            });
+            google.watchMessage(resp.accessToken, null, function(err,result){
+              db.updateUser(resp.email, {historyId: result.historyId})
             });
             google.createLabels(user.accessToken,["bitblock","bitmail"])
           }
@@ -44,7 +45,6 @@ module.exports = {
   setUserWallet(req, res) {
     const data = req.body;
     const user = req.session.user;
-    console.log('Session User', user);
     const contractFile = config.BITMAIL_CONTRACT.PATH;
     const contractName = config.BITMAIL_CONTRACT.NAME;
     const source = fs.readFileSync(contractFile, 'utf8');
@@ -72,8 +72,11 @@ module.exports = {
     const historyId = data_obj.historyId
     const messageId = data_obj.messageId
     db.getUserByEmail(userEmail,function(err, user){
-      const accessToken = user.accessToken 
-      google.handleEmailNotification(userEmail, historyId, messageId, accessToken)
+      if (user){
+        const accessToken = user.accessToken 
+        google.handleEmailNotification(userEmail, historyId, messageId, accessToken)
+      }
     })
+    res.status(200).send()
   }
 }

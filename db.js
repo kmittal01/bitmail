@@ -20,7 +20,8 @@ const UserSchema = new mongoose.Schema({
   },
   accessToken: String,
   accountAddr: String,
-  contractAddr: String
+  contractAddr: String,
+  historyId: String
 });
 
 const EmailSchema = new mongoose.Schema({
@@ -62,7 +63,7 @@ module.exports = {
   },
 
   updateUser(email, values, callback) {
-    callback = callback || function(err, user){ console.log(err, user) };
+    callback = callback || function(err, user){ console.log(err) };
     User.updateOne({ email }, values, (err, res) => {
       if (err) {
         callback(err);
